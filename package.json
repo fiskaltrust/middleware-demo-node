@@ -1,0 +1,23 @@
+{
+  "name": "middleware-demo-node",
+  "version": "1.0.0",
+  "description": "A demo application that demonstrates how to call the fiskaltrust.Middleware from Node.js using gRPC",
+  "main": "app.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fiskaltrust/middleware-demo-node.git"
+  },
+  "author": "fiskaltrust",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/fiskaltrust/middleware-demo-node/issues"
+  },
+  "homepage": "https://github.com/fiskaltrust/middleware-demo-node#readme",
+  "dependencies": {
+    "@grpc/proto-loader": "^0.5.4",
+    "grpc": "^1.24.2",
+    "json-bigint": "^0.3.0",
+    "prompt": "^1.0.0",
+    "readline-sync": "^1.4.10"
+  }
+}
