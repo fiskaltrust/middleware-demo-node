@@ -1,7 +1,7 @@
 const grpc = require('grpc');
 const protoLoader = require('@grpc/proto-loader');
 
-const PROTO_PATH = __dirname + '/../protos/IPOS.proto';
+const PROTO_PATH = __dirname + '/protos/IPOS.proto';
 
 module.exports = {
     getProxy: function(url) {

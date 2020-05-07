@@ -19,5 +19,13 @@
     "json-bigint": "^0.3.0",
     "prompt": "^1.0.0",
     "readline-sync": "^1.4.10"
+  },
+  "devDependencies": {
+    "run-script-os": "^1.1.1"
+  },
+  "scripts": {
+    "postinstall": "run-script-os",
+    "postinstall:win32": "@powershell -NoProfile -ExecutionPolicy Unrestricted -Command ./scripts/postinstall.ps1",
+    "postinstall:linux": ""
   }
 }
