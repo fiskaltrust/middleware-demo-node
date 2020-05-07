@@ -1,48 +1,16 @@
 'use strict'
 
-const PROTO_PATH = __dirname + '/protos/IPOS.proto';
-const RECEIPT_EXAMPLES_PATH = __dirname + '/receipt-examples/de';
-
 const fs = require('fs');
 const path = require('path');
 const glob = require('glob');
-const grpc = require('grpc');
-const protoLoader = require('@grpc/proto-loader');
 const prompt = require('prompt');
 const JSONbig = require('json-bigint');
 const readlineSync = require('readline-sync');
+const protoHelpers = require('./helpers/proto-helpers')
+const convert = require('./helpers/convert')
+const posFactory = require('./pos-factory')
 
-function getGrpcProxy(url) {
-    var packageDefinition = protoLoader.loadSync(
-        PROTO_PATH,
-        {
-            keepCase: true,
-            longs: String,
-            enums: String,
-            defaults: true,
-            oneofs: true
-        });
-
-    var grpcProxyObject = grpc.loadPackageDefinition(packageDefinition).fiskaltrust.ifPOS.v1;
-    return new grpcProxyObject.POS(url, grpc.credentials.createInsecure());
-}
-
-function transformDateTimeToBeProtoCompliant(datetime) {
-    if (!datetime) return undefined;
-
-    return { value: new Date(datetime).getTime(), scale: 4, kind: 2 };
-}
-
-function transformDecimal(dec) {
-    if (!dec) return undefined;
-
-    // TODO: Replace this workaround with a proper serialization and also include the HI bits, instead of just cutting after 15 characters
-    let decStr = dec.toString().substring(0, 15);
-    let split = decStr.split(".");
-    let precision = split.length == 2 ? split[1].length || 0 : 0;
-
-    return { lo: decStr.replace('.', '').substring(0, 15), hi: 0, signScale: precision << 1 };
-}
+const RECEIPT_EXAMPLES_PATH = __dirname + '/../receipt-examples/de';
 
 function loadExamples(files, cashboxId) {
     let examples = [];
@@ -50,38 +18,13 @@ function loadExamples(files, cashboxId) {
     files.forEach(file => {
         let relative = path.relative(RECEIPT_EXAMPLES_PATH, file).replace("\\", "/");
         let rawdata = fs.readFileSync(file);
-        let example = JSONbig.parse(rawdata);
+        let example = protoHelpers.convertReceiptRequestToProto(rawdata, cashboxId);
 
-        example.ftCashBoxID = cashboxId;
-        example.ftReceiptCase = example.ftReceiptCase.toString();
-        example.cbReceiptMoment = transformDateTimeToBeProtoCompliant(example.cbReceiptMoment);
-        example.cbReceiptAmount = transformDecimal(example.cbReceiptAmount);
-        example.cbChargeItems.forEach(chargeItem => {
-            chargeItem.Quantity = transformDecimal(chargeItem.Quantity);
-            chargeItem.Amount = transformDecimal(chargeItem.Amount);
-            chargeItem.VATRate = transformDecimal(chargeItem.VATRate);
-            chargeItem.VATAmount = transformDecimal(chargeItem.VATAmount);
-            chargeItem.UnitQuantity = transformDecimal(chargeItem.UnitQuantity);
-            chargeItem.ftChargeItemCase = chargeItem.ftChargeItemCase.toString();
-        });
-        example.cbPayItems.forEach(payItem => {
-            payItem.Quantity = transformDecimal(payItem.Quantity);
-            payItem.Amount = transformDecimal(payItem.Amount);
-            payItem.ftPayItemCase = payItem.ftPayItemCase.toString();
-        });
         examples.push({ name: relative, value: example })
     });
 
     return examples;
 }
-
-function byteArrayToString(array) {
-    var result = "";
-    for (var i = 0; i < array.length; i++) {
-      result += String.fromCharCode(array[i]);
-    }
-    return result;
-  }
 
 function printMenu(examples, client) {
     examples.forEach((example, index) => {
@@ -100,15 +43,19 @@ function printMenu(examples, client) {
         process.exit(0);
     }
 
+    // Perform sign request
     if (input > 0 && input <= examples.length) {
         let example = examples[input - 1].value;
-        console.log(JSON.stringify(example, null, 4));
+
+        console.log("Request:")
+        console.log(JSONbig.stringify(example, null, 4));
 
         client.Sign(example, function (err, response) {
             if (err) {
                 console.error(err);
             } else {
-                console.log(JSON.stringify(response, null, 4));
+                console.log("Response:")
+                console.log(JSONbig.stringify(response, null, 4));
             }
 
             readlineSync.question('Press enter to continue.', { hideEchoBack: true, mask: '' });
@@ -116,17 +63,17 @@ function printMenu(examples, client) {
             printMenu(examples, client);
         });
     }
+    // Perform journal request
     else if (input >= examples.length + 1 && input <= examples.length + 4) {
         let journalType = input - examples.length - 1;
-        console.log(journalType);
         let result = [];
         let call = client.Journal({ ftJournalType: journalType });
 
-        call.on('data', response => {            
+        call.on('data', response => {
             result = result.concat(response.Chunk);
         });
         call.on('end', () => {
-            console.log(JSONbig.parse(byteArrayToString(result)));
+            console.log(JSONbig.parse(convert.byteArrayToString(result)));
             readlineSync.question('Press enter to continue.', { hideEchoBack: true, mask: '' });
             console.clear();
             printMenu(examples, client);
@@ -152,7 +99,7 @@ function main() {
     prompt.get(schema, function (err, args) {
         if (err) { return onErr(err); }
 
-        var client = getGrpcProxy(args.url);
+        var client = posFactory.getProxy(args.url);
 
         client.Echo({ Message: "Hello World!" }, function (err, response) {
             if (err) {
