@@ -47,11 +47,11 @@ const grpcProxyObject = grpc.loadPackageDefinition(packageDefinition).fiskaltrus
 const pos = new grpcProxyObject.POS(url, grpc.credentials.createInsecure());
 
 client.Echo({ Message: "Hello World!" }, function (err, response) {
-if (err) {
-    console.error(err);
-    return;
-}
-console.log('Echo response:', response.Message);
+    if (err) {
+        console.error(err);
+        return;
+    }
+    console.log('Echo response:', response.Message);
 });
 ```
 
