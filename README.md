@@ -1,4 +1,4 @@
-# fiskaltrust.Middleware demo
+# fiskaltrust.Middleware demo (Node)
 A demo application that demonstrates how to call the fiskaltrust.Middleware from Node.js using gRPC.
 
 ## Getting Started
