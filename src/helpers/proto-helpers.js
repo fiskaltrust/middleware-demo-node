@@ -35,10 +35,11 @@ module.exports = {
         if (!dec) return undefined;
 
         // TODO: Replace this workaround with a proper serialization and also include the HI bits, instead of just cutting after 15 characters
-        let decStr = dec.toString().substring(0, 15);
+        let decStr = dec.toString().replace("-", "").substring(0, 15);
         let split = decStr.split(".");
         let precision = split.length == 2 ? split[1].length || 0 : 0;
+        let shift = dec.toString().startsWith("-") ? 0 : 1;
 
-        return { lo: decStr.replace('.', '').substring(0, 15), hi: 0, signScale: precision << 1 };
+        return { lo: decStr.replace('.', ''), hi: 0, signScale: precision << shift };
     }
 };
