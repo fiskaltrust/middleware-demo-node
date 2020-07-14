@@ -2,7 +2,7 @@
   "name": "middleware-demo-node",
   "version": "1.0.0",
   "description": "A demo application that demonstrates how to call the fiskaltrust.Middleware from Node.js using gRPC",
-  "main": "app.js",
+  "main": "src/app.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/fiskaltrust/middleware-demo-node.git"
@@ -14,18 +14,19 @@
   },
   "homepage": "https://github.com/fiskaltrust/middleware-demo-node#readme",
   "dependencies": {
-    "@grpc/proto-loader": "^0.5.4",
-    "grpc": "^1.24.2",
-    "json-bigint": "^0.3.0",
-    "prompt": "^1.0.0",
-    "readline-sync": "^1.4.10"
+    "@grpc/grpc-js": "^1.1.2",
+    "@grpc/proto-loader": "^0.5.5",
+    "glob": "^7.1.6",
+    "inquirer": "^7.3.2",
+    "json-bigint": "^0.4.0"
   },
   "devDependencies": {
     "run-script-os": "^1.1.1"
   },
   "scripts": {
+    "start": "node src/app.js",
     "postinstall": "run-script-os",
     "postinstall:win32": "@powershell -NoProfile -ExecutionPolicy Unrestricted -Command ./scripts/postinstall.ps1",
-    "postinstall:linux": ""
+    "postinstall:linux": "sh ./scripts/postinstall.sh"
   }
 }

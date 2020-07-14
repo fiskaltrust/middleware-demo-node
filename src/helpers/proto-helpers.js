@@ -1,7 +1,7 @@
 const JSONbig = require('json-bigint');
 
 module.exports = {
-    convertReceiptRequestToProto: function(str, cashboxId) {
+    convertReceiptRequestToProto: function (str, cashboxId) {
         let receiptRequest = JSONbig.parse(str);
 
         receiptRequest.ftCashBoxID = cashboxId;
@@ -26,12 +26,12 @@ module.exports = {
 
         return receiptRequest;
     },
-    convertJsDatetimeToProto: function (datetime) {
+    convertJsDatetimeToProto: (datetime) => {
         if (!datetime) return undefined;
 
         return { value: new Date(datetime).getTime(), scale: 4, kind: 2 };
     },
-    convertJsDecimalToProto: function (dec) {
+    convertJsDecimalToProto: (dec) => {
         if (!dec) return undefined;
 
         // TODO: Replace this workaround with a proper serialization and also include the HI bits, instead of just cutting after 15 characters
