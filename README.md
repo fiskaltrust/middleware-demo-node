@@ -14,7 +14,7 @@ This example uses the .proto files of the fiskaltrust Middleware interface to au
 To run the demo, Node.js and NPM need to be installed. Follow the following steps:
 
 ### Running the Demo
-After cloning the repository, switch to the `src` folder and run the following commands to setup and start the application. `npm install` will automatically pull the latest .proto files, and put them into the `/proto` folder.
+After cloning the repository, run the following commands to setup and start the application. `npm install` will automatically pull the latest .proto files, and put them into the `/proto` folder.
 
 ```sh
 npm install   # This will also download the .proto files
