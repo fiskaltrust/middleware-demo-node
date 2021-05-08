@@ -18,7 +18,7 @@
     "@grpc/proto-loader": "^0.5.5",
     "glob": "^7.1.6",
     "inquirer": "^7.3.2",
-    "json-bigint": "^0.4.0"
+    "json-bigint": "^1.0.0"
   },
   "devDependencies": {
     "run-script-os": "^1.1.1"
