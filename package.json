@@ -14,7 +14,7 @@
   },
   "homepage": "https://github.com/fiskaltrust/middleware-demo-node#readme",
   "dependencies": {
-    "@grpc/grpc-js": "^1.6.6",
+    "@grpc/grpc-js": "^1.8.8",
     "@grpc/proto-loader": "^0.6.9",
     "glob": "^8.0.1",
     "inquirer": "^8.2.2",
